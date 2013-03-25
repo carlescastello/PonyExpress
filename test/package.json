@@ -7,6 +7,7 @@
 		"swig"        : "*",
         "consolidate" : "*",
         "Faker"       : "*",
-        "node-uuid"   : "*"
+        "node-uuid"   : "*",
+        "socket.io-client" : "*"
 	}
 }
