@@ -54,7 +54,25 @@ app.delete('/messages/:id', function (req, res){
 		}
 	};
 
-	res.send(500, {status:"Fail"});
+	io.sockets.emit('message::delete', req.params);
+
+	res.send(200, {status:"Ok"});
+});
+
+app.put('/messages/:id', function (req, res){
+	var message;
+
+	for (var i = messages.length - 1; i >= 0; i--) {
+		message = messages[i];
+
+		if(message.id === req.params.id){
+			message = req.body;
+		}
+	};
+
+	io.sockets.emit('message::update', req.body);
+
+	res.send(200, {status:"Ok"});
 });
 
 app.get('/messages', function (req, res) {

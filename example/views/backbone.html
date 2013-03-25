@@ -1,0 +1,116 @@
+<html>
+<head>
+	<title>PonyExpress</title>
+	<!-- dependencies !-->
+	<script type="text/javascript" src="dependencies/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="dependencies/neon.js"></script>
+	<script type="text/javascript" src="dependencies/CustomEvent.js"></script>
+	<script type="text/javascript" src="dependencies/CustomEventSupport.js"></script>
+	<script type="text/javascript" src="socket.io/socket.io.js"></script>
+
+	<!-- backbone !-->
+	<script type="text/javascript" src="dependencies/underscore-min.js"></script>
+	<script type="text/javascript" src="dependencies/backbone.js"></script>
+
+	<!-- library !-->
+	<script type="text/javascript" src="lib/PonyExpress.js"></script>
+	<!-- demo code !-->
+	<script type="text/javascript">
+	// Pony Expless and backbone collections are outside document ready because data layer is not relevant to the dom existing.
+	window.ponyExpress = new PonyExpress({
+		io : "http://localhost:3000"
+	});
+
+	window.MessageModel = Backbone.Model.extend({
+		urlRoot : "/messages",
+	});
+
+	window.MessageCollection =  Backbone.Collection.extend({
+		name  : "message",
+		model : window.MessageModel
+	});
+
+	window.messageCollection = new MessageCollection();
+
+	window.ponyExpress.bind('connect', function(){
+		var xhrMessages = $.get('/messages');
+
+		xhrMessages.done(function(data){
+			window.messageCollection.add(data);
+
+			window.messagePlug  = new PonyExpress.BackbonePlug({
+				collection : window.messageCollection
+			});			
+		});
+	});
+
+	$(document).ready(function(){
+		window.ChatView = Backbone.View.extend({
+			tpl: _.template( $('#chat-template').html() ),
+			initialize : function(config){
+				var chatView = this;
+
+				this.$el = this.targetElement || this.$el;
+				this.el = this.$el[0];
+
+				this.render();
+				this.$el.appendTo('#chat');
+
+				window.messageCollection.on('add', function(messageModel){
+					var messageView = new MessageView({
+						model: messageModel,
+						id: "message-" + messageModel.id
+					});
+
+					messageView.$el.prependTo( chatView.$el.find('.messages') );
+				});
+			},
+			render : function(){
+				this.$el.html( this.tpl({}) );
+			}
+		});
+
+		window.MessageView = Backbone.View.extend({
+			tpl: _.template( $('#message-template').html() ),
+			initialize : function(config){
+				var messageView = this;
+
+				this.render();
+
+				this.model.on('change', function(){
+					messageView.render();
+					messageView.$el.css('background','grey'); 	
+				});
+
+				this.model.on('destroy', function(){
+					console.log('destroying', this.toJSON() );
+					messageView.remove();
+				});
+
+				return this;
+			},
+			render : function(){
+				this.$el.html( this.tpl( this.model.toJSON() ) );
+			}
+		});
+
+		window.chat = new window.ChatView({
+			targetElement : $('#chat')
+		})
+	});
+	</script>
+</head>
+<body>
+	<div id="chat"></div>
+	<script type="text/template" id="chat-template">
+		<p>User : <input id="user" type="text"/></p>
+		<p>Message: <textarea id="text"></textarea></p>
+		<p><button id="submit">Enviar</button></p>
+		<div class="messages"/>
+	</script>
+	<script type="text/template" id="message-template">
+		<h2><%= user %></h2>
+		<p><%= text %></p>
+	</script>
+</body>
+</html>
