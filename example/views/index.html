@@ -1,0 +1,95 @@
+<html>
+<head>
+	<title>PonyExpress</title>
+	<!-- dependencies !-->
+	<script type="text/javascript" src="dependencies/jquery-1.9.1.min.js"></script>
+	<script type="text/javascript" src="dependencies/underscore-min.js"></script>
+	<script type="text/javascript" src="dependencies/neon.js"></script>
+	<script type="text/javascript" src="dependencies/CustomEvent.js"></script>
+	<script type="text/javascript" src="dependencies/CustomEventSupport.js"></script>
+	<script type="text/javascript" src="socket.io/socket.io.js"></script>
+	<!-- library !-->
+	<script type="text/javascript" src="lib/PonyExpress.js"></script>
+	<!-- demo code !-->
+	<script type="text/javascript">
+	$(document).ready(function () {
+		window.ponyExpress = new PonyExpress({
+			io : "http://localhost:3000"
+		});
+
+		var xhrMessages = $.get('/messages');
+
+		xhrMessages.done(function(data){
+			console.log(data);
+
+			window.chatModel = new PonyExpress.Plug({
+				name : "message"
+			});
+
+			window.chat = new ChatUi({
+				targetElement : $('#chat'),
+				data : data
+			});
+		});
+
+
+		Class('ChatUi')({
+			prototype : {
+				init   : function(config){
+					var chatUi = this;
+					chatUi.targetElement = config.targetElement;
+
+					config.data.forEach(function(item){
+						chatUi.addMessage(item);
+					})
+
+					window.chatModel.bind('create', function(data){
+						chatUi.addMessage(data);
+					});
+
+					window.chatModel.bind('delete', function(data){
+						chatUi.removeMessage(data);
+					});					
+
+					window.chatModel.bind('update', function(data){
+						chatUi.updateMessage(data);
+					});										
+				},
+				addMessage : function(data){
+					var chatUi = this;
+
+					var message = $('<div><h4></h4><div></div></div>');
+
+					message.find('> h4').text(data.user);
+					message.find('> div').text(data.text);
+
+					message.attr('id', 'message-'+data.id);
+
+					chatUi.targetElement.prepend(message);
+				},
+				removeMessage : function(data){
+					var chatUi  = this;
+					var message = chatUi.targetElement.find('#message-' + data.id);
+
+					message.fadeOut(function(){
+						message.remove();
+					});
+				},
+				updateMessage : function(data){
+					var chatUi  = this;
+					var message = chatUi.targetElement.find('#message-' + data.id);
+
+					message.find('> h4').text(data.user);
+					message.find('> div').text(data.text);
+
+					message.css('background','#ccc');
+				}				
+			}
+		});
+	});
+	</script>
+</head>
+<body>
+	<div id="chat"></div>
+</body>
+</html>
