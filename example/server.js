@@ -8,6 +8,7 @@ var express  = require('express'),
 	messages = [];
 
 server.listen(3000);
+console.log('visit http://localhost:3000 for simple example \nvisit http://localhost:3000/backbone for backbone example');
 
 swig.init({
 	cache : false
@@ -54,7 +55,7 @@ app.delete('/messages/:id', function (req, res){
 		}
 	};
 
-	io.sockets.emit('message::delete', req.params);
+	io.sockets.emit('message::delete', {id:req.params.id});
 
 	res.send(200, {status:"Ok"});
 });
@@ -66,7 +67,7 @@ app.put('/messages/:id', function (req, res){
 		message = messages[i];
 
 		if(message.id === req.params.id){
-			message = req.body;
+			messages[i] = req.body;
 		}
 	};
 
@@ -76,11 +77,8 @@ app.put('/messages/:id', function (req, res){
 });
 
 app.get('/messages', function (req, res) {
-	console.log('===> messages', messages.length );
 	res.send(messages);
 });
-
-console.log(app.routes);
 
 var connection = function(socket){		
 	socket.on('message::create', function(data){
@@ -100,8 +98,6 @@ var connection = function(socket){
 
 io.sockets.on('connection', connection);
 
-return;
-
 // Fake client
 var Faker    = require('Faker'),
 	ioClient = require('socket.io-client'),
@@ -111,11 +107,11 @@ var Faker    = require('Faker'),
 
 setInterval(function(){
 	if(Math.random() > 0.3){
-		lastMessage.text = Faker.Lorem.sentence();
+		lastMessage.highlight = true;
 
 		socket.emit('message::update', lastMessage);
 	}
-},2000);
+},5000);
 
 setInterval(function(){
 	if(Math.random() > 0.3){

@@ -1,6 +1,11 @@
 <html>
 <head>
 	<title>PonyExpress</title>
+	<style>
+	.highlighted {
+		background: grey;
+	}
+	</style>
 	<!-- dependencies !-->
 	<script type="text/javascript" src="dependencies/jquery-1.9.1.min.js"></script>
 	<script type="text/javascript" src="dependencies/neon.js"></script>
@@ -47,6 +52,9 @@
 	$(document).ready(function(){
 		window.ChatView = Backbone.View.extend({
 			tpl: _.template( $('#chat-template').html() ),
+			events : {
+				"click #submit" : "send"
+			},
 			initialize : function(config){
 				var chatView = this;
 
@@ -65,6 +73,21 @@
 					messageView.$el.prependTo( chatView.$el.find('.messages') );
 				});
 			},
+			send : function(){
+				var user = this.$el.find('#user').val(),
+					text = this.$el.find('#text').val();
+
+				if( !user || !text ){
+					return;
+				}
+
+				var model = new MessageModel({user: user, text: text});
+
+				//Is added after the 
+				model.save();
+				
+				this.$el.find('#text').val("");
+			},
 			render : function(){
 				this.$el.html( this.tpl({}) );
 			}
@@ -72,6 +95,10 @@
 
 		window.MessageView = Backbone.View.extend({
 			tpl: _.template( $('#message-template').html() ),
+			events : {
+				"click .highlight" : "highlightHandler",
+				"click .remove"    : "removeHandler"
+			},			
 			initialize : function(config){
 				var messageView = this;
 
@@ -79,18 +106,41 @@
 
 				this.model.on('change', function(){
 					messageView.render();
-					messageView.$el.css('background','grey'); 	
 				});
 
-				this.model.on('destroy', function(){
+				this.destroyHandler = function(){
 					console.log('destroying', this.toJSON() );
 					messageView.remove();
-				});
+				}
+
+				this.model.on('destroy', this.destroyHandler);
 
 				return this;
 			},
+			highlightHandler : function(){
+
+				if(this.model.get('highlight')){
+					this.model.set('highlight', false);
+				}else{
+					this.model.set('highlight', true);
+				}
+				this.model.save();
+
+				this.render();
+			},
+			removeHandler : function(){
+				this.model.off('destroy', this.destroyHandler);
+				this.model.destroy();
+				this.remove();
+			},
 			render : function(){
 				this.$el.html( this.tpl( this.model.toJSON() ) );
+
+				if(this.model.get('highlight')){
+					this.$el.addClass('highlighted');
+				}else{
+					this.$el.removeClass('highlighted');
+				}
 			}
 		});
 
@@ -111,6 +161,7 @@
 	<script type="text/template" id="message-template">
 		<h2><%= user %></h2>
 		<p><%= text %></p>
+		<p><label class="highlight">Highlight</label> <label class="remove">Remove</label></p>
 	</script>
 </body>
 </html>
