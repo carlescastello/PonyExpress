@@ -13,6 +13,12 @@ Te.suite('Pony Express')(function() {
 
 		 	spec.completed();
 		});
+
+		this.specify('Connection')(function(spec){
+			spec.assert( window.ponyExpress.connected ).toBe(true);
+
+			spec.completed();
+		});
 	});
 
 	this.describe('2.- Pony Express Basic Bindings')(function() {
@@ -73,7 +79,7 @@ Te.suite('Pony Express')(function() {
 				spec.assert( data.status ).toBe( "moved" );
 				spec.completed();
 			});
-			
+
 			$.post('/mirror',{
 				type   : 'message',
 				action : 'move',

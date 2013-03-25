@@ -17,16 +17,4 @@ $(document).ready(function () {
 		},
 		collection : window.messageCollection
 	});
-
-	// window.messagePlug = new PonyExpress.Plug({
-	// 	name : "message",
-	// 	events : ['move'],
-	// 	onMove : function(data){
-	// 		if(!data.id){
-	// 			throw "PonyExpress Items need id";
-	// 		}
-			
-	// 		this.dispatch('move', data);
-	// 	}
-	// });
-})
+});

@@ -19,11 +19,8 @@
 
 	<!-- demo code !-->
 	<script type="text/javascript">
-	$(document).ready(function () {
-
-		setTimeout(function(){
-			Te.run();
-		}, 500);
+	window.ponyExpress.bind('connect', function(){
+		Te.run();
 	});
 	</script>
 </head>
