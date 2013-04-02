@@ -22,34 +22,39 @@
 	<!-- demo code !-->
 	<script type="text/javascript">
 	// Pony Expless and backbone collections are outside document ready because data layer is not relevant to the dom existing.
+	/* Iniciamos PonyExpress indicando donde escucha nuestro socket */
 	window.ponyExpress = new PonyExpress({
 		io : "http://localhost:3000"
 	});
-
+	/* Creo un modelo de mensaje con un modelo de backbone extendido indicando cual es la url donde realiza el POST de los mensajes */
 	window.MessageModel = Backbone.Model.extend({
 		urlRoot : "/messages",
 	});
-
+	/* Creo una colecion de mensajes backbone extendida en donde incuimos el mensaje y junto a el el modelo del mensaje */
 	window.MessageCollection =  Backbone.Collection.extend({
 		name  : "message",
 		model : window.MessageModel
 	});
-
+        /* Creo una coleccion apartir del constructor anterior */
 	window.messageCollection = new MessageCollection();
-
+	/* Inicio un bind de pony */
 	window.ponyExpress.bind('connect', function(){
+		/* Obtengo el json de los mensajes */
 		var xhrMessages = $.get('/messages');
-
+		/* Si todo sale bien ejecuto la funcion */
 		xhrMessages.done(function(data){
+			/* Agrego los datos a la coleccion de mensajes */
 			window.messageCollection.add(data);
-
+			/* Creo un Plug de pony en donde agrego mi colecion de mensajes */
 			window.messagePlug  = new PonyExpress.BackbonePlug({
 				collection : window.messageCollection
 			});			
 		});
 	});
-
+	/* Inicio jQuery */
 	$(document).ready(function(){
+		/* Chat View  sera una vista de backbone extendida con los eventos que se aplicaran sobre la vista del chat */
+		/* Evento SEND RENDER e INITIALIZE */
 		window.ChatView = Backbone.View.extend({
 			tpl: _.template( $('#chat-template').html() ),
 			events : {
@@ -92,7 +97,7 @@
 				this.$el.html( this.tpl({}) );
 			}
 		});
-
+		/* Creo una vista extendida de backbone para cada mensaje con la funcion de FAV y remover el mensaje */
 		window.MessageView = Backbone.View.extend({
 			tpl: _.template( $('#message-template').html() ),
 			events : {
@@ -143,11 +148,12 @@
 				}
 			}
 		});
-
+		/* Creo un chat view bajo el id Chat */
 		window.chat = new window.ChatView({
 			targetElement : $('#chat')
 		})
 	});
+	/* Fin jQuery */
 	</script>
 </head>
 <body>
