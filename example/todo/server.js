@@ -16,8 +16,6 @@ swig.init({
 	cache : false
 });
 
-/* Arreglo de mensajes */
-var ToDoTask = [];
 
 /* Coloco engine con swig */
 app.engine('.html', cons.swig);
