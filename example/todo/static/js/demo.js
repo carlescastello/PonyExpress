@@ -127,19 +127,19 @@ $(document).ready(function(){
 			$('#submit').click();
 		}
 	});
-	$('#todos').on('click',function(){
+	$('#all').on('click',function(){
 		$('.TaskComplete').show();
 		$('.TaskIncomplete').show();
 	});
-	$('#completo').on('click',function(){
+	$('#complete').on('click',function(){
 		$('.TaskComplete').show();
 		$('.TaskIncomplete').hide();
 	});
-	$('#incompleto').on('click',function(){
+	$('#incomplete').on('click',function(){
 		$('.TaskIncomplete').show();
 		$('.TaskComplete').hide();
 	});
-	$('.escribe').on('click',function(){
+	$('.write').on('click',function(){
 		$('.TaskIncomplete').find('.highlight').click();
 	});
 });
