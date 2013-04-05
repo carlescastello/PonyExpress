@@ -1,3 +1,4 @@
-example/node_modules
+todo/node_modules
+chat/node_modules
 test/node_modules
 .DS_Store
