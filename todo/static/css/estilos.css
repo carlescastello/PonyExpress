@@ -57,6 +57,7 @@ nav
 }
 .escribe
 {
+	cursor: pointer;
 	display: inline-block;
 	font-size: 2em;
 	margin-left: 14px;

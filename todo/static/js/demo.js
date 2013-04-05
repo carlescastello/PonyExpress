@@ -139,4 +139,7 @@ $(document).ready(function(){
 		$('.TaskIncomplete').show();
 		$('.TaskComplete').hide();
 	});
+	$('.escribe').on('click',function(){
+		$('.TaskIncomplete').find('.highlight').click();
+	});
 });
