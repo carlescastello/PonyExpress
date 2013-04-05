@@ -37,7 +37,7 @@ nav
 {
 	display: none;
 }
-#todos, #incompleto, #completo 
+#all, #incomplete, #complete
 {
 	background: white;
 	border-radius: 0.8em;
@@ -55,7 +55,7 @@ nav
 {
 	margin-bottom: 55px;
 }
-.escribe
+.write
 {
 	cursor: pointer;
 	display: inline-block;
