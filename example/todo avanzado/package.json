@@ -1,0 +1,13 @@
+{
+	"name"    : "carrier-example",
+	"version" : "0.0.1",
+	"dependencies" : {
+		"socket.io"   : "*",
+		"express"     : "*",
+		"swig"        : "*",
+        "consolidate" : "*",
+        "Faker"       : "*",
+        "node-uuid"   : "*",
+        "socket.io-client" : "*"
+	}
+}

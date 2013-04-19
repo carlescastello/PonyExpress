@@ -1,4 +1,6 @@
-todo/node_modules
-chat/node_modules
+example/todo/node_modules
+example/chat/node_modules
+example/todo avanzado/node_modules
 test/node_modules
+
 .DS_Store
