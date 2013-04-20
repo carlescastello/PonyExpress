@@ -1,9 +1,19 @@
+/* #### Conection to Channel Notification #### */ 
+var socket = io.connect();
+var channel = "notification";
+ 
+socket.on('connect', function() {
+   socket.emit('channel', channel);
+});
+/* #### Conection to Channel Notification #### */ 
+
+
 window.ponyExpress = new PonyExpress({
 	io : "http://localhost:3000"
 });
 
 
-
+/* #### Tasks #### */
 window.ToDoTaskModel = Backbone.Model.extend({
 	urlRoot : "/ToDoTask"
 });
@@ -12,9 +22,9 @@ window.ToDoTaskCollection =  Backbone.Collection.extend({
 	name  : "ToDoList",
 	model : window.ToDoTaskModel
 });
+/* #### Tasks #### */
 
-
-
+/* #### Comments #### */
 window.ToDoCommentModel = Backbone.Model.extend({
 	urlRoot : "/ToDoComment"
 });
@@ -22,14 +32,33 @@ window.CommentCollection =  Backbone.Collection.extend({
 	name  : "ToDoComment",
 	model : window.ToDoCommentModel
 });
+/* #### Comments #### */
 
 
+/* #### Notifications #### */
+window.ToDoNotificationModel = Backbone.Model.extend({
+	urlRoot : "/ToDoNotification"
+});
+window.NotificationCollection =  Backbone.Collection.extend({
+	name  : "ToDoNotifications",
+	model : window.ToDoNotificationModel
+});
+/* #### Notifications #### */
 
 window.ToDoListCollection = new ToDoTaskCollection();
-
 window.ToDoCommentCollection = new CommentCollection();
+window.ToDoNotificationCollection = new NotificationCollection();
+
 
 window.ponyExpress.bind('connect', function(){
+
+	var xhrToDoTasks = $.get('ToDoNotification');
+	xhrToDoTasks.done(function(data){
+		window.ToDoNotificationCollection.add(data);
+		window.ToDoListPlug  = new PonyExpress.BackbonePlug({
+			collection : window.ToDoNotificationCollection
+		});			
+	});
 
 	var xhrToDoComment = $.get('/ToDoComment');
 	xhrToDoComment.done(function(data){
@@ -49,7 +78,39 @@ window.ponyExpress.bind('connect', function(){
 
 });
 
+
 $(document).ready(function(){
+
+	var y=0;
+
+	/* #### Notification #### */
+	socket.on('ToDoComment::create', function(data) {
+		var model = new ToDoNotificationModel( {text: 'New comment by: ' + data.user } );
+		console.log(model);
+		$('#notification').prepend('<div class="not">' + model.attributes.text +'</div>');
+		model.save()
+	});
+
+	socket.on('ToDoList::create', function(data) {
+		var model = new ToDoNotificationModel( {text: 'New task by: ' + data.user} );
+		$('#notification').prepend('<div class="not">' + model.attributes.text + '</div>');
+		model.save()
+	});
+
+	socket.on('ToDoList::update', function(data) {
+		if (data.TaskStatus){
+			var model = new ToDoNotificationModel( {text: 'Update task: ' + data.text + ' now is complete'} );
+			$('#notification').prepend('<div class="not">' + model.attributes.text + '</div>');
+			model.save()
+		}else{
+			var model = new ToDoNotificationModel( {text: 'Update task: ' + data.text + ' now is incomplete'} );
+			$('#notification').prepend('<div class="not">' + model.attributes.text + '</div>');
+			model.save()
+		}
+	});
+	/* #### Notification #### */
+
+
 
 	window.ToDoView = Backbone.View.extend({
 		tpl: _.template( $('#AddTask').html() ),
@@ -65,6 +126,7 @@ $(document).ready(function(){
 
 			this.render();
 			this.$el.appendTo('#Tasks');
+
 
 			window.ToDoListCollection.on('add', function(ToDoListModel){
 				var ToDoListView = new ToDoTaskView({
@@ -163,14 +225,11 @@ $(document).ready(function(){
 				this.$el.find('.answer-comments').css('height','200px');
 				this.$el.find('.answer-comments').css('overflow','auto');
 
-				i = 1;
-
 			}else{
 				this.$el.find('.answer').css('border-top','0px');
 				this.$el.find('.answer').css('height','0px');
 				this.$el.find('.answer').css('padding','0px');
 				this.$el.find('.answer-comments').css('height','0px');
-				i = 0;
 			}
 		},
 
@@ -216,6 +275,13 @@ $(document).ready(function(){
 
 			div_id = this.$el;
 
+			if (y == 0){
+				ToDoNotificationCollection.forEach(function (data) {
+					$('#notification').prepend('<div class="not">' + data.attributes.text + '</div>');
+				});
+				y=1;
+			}
+
 			ToDoCommentCollection.forEach(function( data ){
 				if ( data.attributes.Task == div_id[0].id ){
 					div_id.find('div.answer-comments').append("<div class='comments'><h3>"+data.attributes.user+"</h3><p>"+data.attributes.text+"</p>");
@@ -223,12 +289,13 @@ $(document).ready(function(){
 			});
 		}
 	});
-
+	
 	var i = 0;
 
 	window.tareas = new window.ToDoView({
 		targetElement : $('#Tasks')
 	});
+
 
 	$('#text').keyup(function(data){
 		if (data.keyCode == 13){
@@ -254,5 +321,21 @@ $(document).ready(function(){
 	$('.write').on('click',function(){
 		$('.TaskIncomplete').find('.highlight').click();
 	});
+	$('#notification').hide();
+	$('.icon-not').on('click',function(){
+		if (i == 0){
+			$('#notification').show();
+			i = 1;
+		}else
+		{
+			$('#notification').hide();
+			i = 0;
+		}
+	});
+	$('#notification').mouseleave(function(){
+		$('#notification').hide();
+		i = 0;
+	});
+
 
 });

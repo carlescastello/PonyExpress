@@ -7,16 +7,12 @@ var express  = require('express'),
 	cons     = require('consolidate'),
 	uuid     = require('node-uuid'),
 	ToDoTask = [],
-	ToDoComment = [];
-
-server.listen(3000);
-console.log('visita http://localhost:3000 para ver el ToDo');
-
+	ToDoComment = [],
+	ToDoNotification = [];
 
 swig.init({
 	cache : false
 });
-
 
 app.engine('.html', cons.swig);
 app.set('view engine', 'html');
@@ -26,6 +22,7 @@ app.use(express.static('./static'));
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.methodOverride());
+
 
 /* GET a / */
 app.get('/', function (req, res) {
@@ -40,7 +37,6 @@ app.get('/ToDoTask', function (req, res) {
 
 app.post('/ToDoTask', function (req, res){
 	req.body.id = uuid.v1();
-	console.log('body', req.body);
 
 	ToDoTask.push(req.body);
 
@@ -91,7 +87,7 @@ app.get('/ToDoComment', function (req, res) {
 
 app.post('/ToDoComment', function (req, res){
 	req.body.id = uuid.v1();
-	console.log('body', req.body);
+
 
 	ToDoComment.push(req.body);
 
@@ -99,77 +95,73 @@ app.post('/ToDoComment', function (req, res){
 
 	res.send(200, {status:"Ok"});
 });
-
-app.delete('/ToDoComment/:id', function (req, res){
-	var ToDoList;
-
-	for (var i = ToDoComment.length - 1; i >= 0; i--) {
-		ToDoList = ToDoComment[i];
-
-		if(ToDoList.id === req.params.id){
-			ToDoComment.splice(i,1);
-		}
-	};
-
-	io.sockets.emit('ToDoComment::delete', {id:req.params.id});
-
-	res.send(200, {status:"Ok"});
-});
-
-app.put('/ToDoComment/:id', function (req, res){
-	var ToDoList;
-
-	for (var i = ToDoComment.length - 1; i >= 0; i--) {
-		ToDoList = ToDoComment[i];
-
-		if(ToDoList.id === req.params.id){
-			ToDoComment[i] = req.body;
-		}
-	};
-
-	io.sockets.emit('ToDoComment::update', req.body);
-
-	res.send(200, {status:"Ok"});
-});
-
-app.get('/ToDoComment', function (req, res) {
-	res.send(ToDoComment);
-});
 /* ####  Comment  #### */
 
 
 
-/* Establece eventos create delete y update para cada mensaje en cada socket */
+/* ####  Notification  #### */
+app.get('/ToDoNotification', function (req, res) {
+	res.send(ToDoNotification);
+});
+
+app.post('/ToDoNotification', function (req, res){
+	req.body.id = uuid.v1();
+
+	ToDoNotification.push(req.body);
+
+	io.sockets.emit('ToDoNotification::create', req.body);
+
+	res.send(200, {status:"Ok"});
+});
+/* ####  Notification  #### */
+
+
 var connection = function(socket){	
+
 
 	/* Events Sockets for Tasks */
 	socket.on('ToDoList::create', function(data){
 		ToDoTask.push(data);
 		socket.broadcast.emit('ToDoList::create', data);
+		channel = "notification";
+		io.sockets.in(channel).emit('message',data);
 	});
-
 	socket.on('ToDoList::delete', function(data){
 		socket.broadcast.emit('ToDoList::delete', data);
 	});
-
 	socket.on('ToDoList::update', function(data){
 		socket.broadcast.emit('ToDoList::update', data);
+		channel = "notification";
+		io.sockets.in(channel).emit('message',data);
 	});
+
 
 	/* Events Sockets for comments */
 	socket.on('ToDoComment::create', function(data){
 		ToDoComment.push(data);
 		socket.broadcast.emit('ToDoComment::create', data);
+	    channel = "notification";
+		io.sockets.in(channel).emit('message',data);
 	});
 
-	socket.on('ToDoComment::delete', function(data){
-		socket.broadcast.emit('ToDoComment::delete', data);
-	});
 
-	socket.on('ToDoComment::update', function(data){
-		socket.broadcast.emit('ToDoComment::update', data);
+	/* Events Sockets for notification */
+	socket.on('ToDoComment::create', function(data){
+		ToDoNotification.push(data);
+		socket.broadcast.emit('ToDoComment::create', data);
 	});
+	
+
+	/* #### Join to channel #### */
+	socket.on('channel', function(channel) {
+        socket.join(channel);
+        console.log(channel);
+    });
 
 }
 
 io.sockets.on('connection', connection);
+
+
+server.listen(3000);
+console.log('visita http://localhost:3000 para ver el ToDo');
