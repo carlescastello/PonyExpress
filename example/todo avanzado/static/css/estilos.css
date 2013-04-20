@@ -59,7 +59,7 @@ nav
 	background: #dbdbdb;
 	border: 1px solid rgb(209, 210, 211);
 	box-shadow: rgb(209, 210, 211) 0px 0px 1em;
-	height: 250px;
+	max-height: 250px;
 	left: 70%;
 	overflow: auto;
 	padding: 1em 0;

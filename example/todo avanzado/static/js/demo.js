@@ -52,7 +52,7 @@ window.ToDoNotificationCollection = new NotificationCollection();
 
 window.ponyExpress.bind('connect', function(){
 
-	var xhrToDoTasks = $.get('ToDoNotification');
+	var xhrToDoTasks = $.get('/ToDoNotification');
 	xhrToDoTasks.done(function(data){
 		window.ToDoNotificationCollection.add(data);
 		window.ToDoListPlug  = new PonyExpress.BackbonePlug({
