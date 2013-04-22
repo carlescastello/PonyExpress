@@ -79,8 +79,8 @@ $(document).ready(function(){
 	/* #### Notification #### */
 	socket.on('ToDoComment::create', function(data) {
 		var model = new ToDoNotificationModel( {text: 'New comment by: ' + data.user } );
-		console.log(model);
 		$('#notification').prepend('<div class="not">' + model.attributes.text +'</div>');
+		$('#' + data.Task ).find('.answer-comments').append("<div class='comments'><h3>" + data.user + "</h3><p>" + data.text + "</p>");
 		model.save();
 	});
 
@@ -239,8 +239,6 @@ $(document).ready(function(){
 
 			model.save();
 
-
-			this.$el.find('div.answer-comments').append("<div class='comments'><h3>"+user+"</h3><p>"+text+"</p>");
 
 			this.$el.find('.text').val("");
 
