@@ -1,12 +1,4 @@
-/* #### Conection to Channel Notification #### */ 
 var socket = io.connect();
-var channel = "notification";
- 
-socket.on('connect', function() {
-   socket.emit('channel', channel);
-});
-/* #### Conection to Channel Notification #### */ 
-
 
 window.ponyExpress = new PonyExpress({
 	io : "http://localhost:3000"
@@ -52,12 +44,13 @@ window.ToDoNotificationCollection = new NotificationCollection();
 
 window.ponyExpress.bind('connect', function(){
 
-	var xhrToDoTasks = $.get('/ToDoNotification');
-	xhrToDoTasks.done(function(data){
+	var ToDoNotification = $.get('/ToDoNotification');
+	ToDoNotification.done(function(data){
 		window.ToDoNotificationCollection.add(data);
 		window.ToDoListPlug  = new PonyExpress.BackbonePlug({
-			collection : window.ToDoNotificationCollection
-		});			
+			collection : window.ToDoNotificationCollection,
+			channel    : "notification"
+		});
 	});
 
 	var xhrToDoComment = $.get('/ToDoComment');
@@ -65,7 +58,7 @@ window.ponyExpress.bind('connect', function(){
 		window.ToDoCommentCollection.add(data);
 		window.ToDoCommentPlug  = new PonyExpress.BackbonePlug({
 			collection : window.ToDoCommentCollection
-		});			
+		});
 	});
 
 	var xhrToDoTasks = $.get('/ToDoTask');
@@ -73,7 +66,7 @@ window.ponyExpress.bind('connect', function(){
 		window.ToDoListCollection.add(data);
 		window.ToDoListPlug  = new PonyExpress.BackbonePlug({
 			collection : window.ToDoListCollection
-		});			
+		});
 	});
 
 });
@@ -88,24 +81,25 @@ $(document).ready(function(){
 		var model = new ToDoNotificationModel( {text: 'New comment by: ' + data.user } );
 		console.log(model);
 		$('#notification').prepend('<div class="not">' + model.attributes.text +'</div>');
-		model.save()
+		model.save();
 	});
 
 	socket.on('ToDoList::create', function(data) {
 		var model = new ToDoNotificationModel( {text: 'New task by: ' + data.user} );
 		$('#notification').prepend('<div class="not">' + model.attributes.text + '</div>');
-		model.save()
+		model.save();
 	});
 
 	socket.on('ToDoList::update', function(data) {
+		var model;
 		if (data.TaskStatus){
-			var model = new ToDoNotificationModel( {text: 'Update task: ' + data.text + ' now is complete'} );
+			model = new ToDoNotificationModel( {text: 'Update task: ' + data.text + ' now is complete'} );
 			$('#notification').prepend('<div class="not">' + model.attributes.text + '</div>');
-			model.save()
+			model.save();
 		}else{
-			var model = new ToDoNotificationModel( {text: 'Update task: ' + data.text + ' now is incomplete'} );
+			model = new ToDoNotificationModel( {text: 'Update task: ' + data.text + ' now is incomplete'} );
 			$('#notification').prepend('<div class="not">' + model.attributes.text + '</div>');
-			model.save()
+			model.save();
 		}
 	});
 	/* #### Notification #### */
@@ -131,7 +125,7 @@ $(document).ready(function(){
 			window.ToDoListCollection.on('add', function(ToDoListModel){
 				var ToDoListView = new ToDoTaskView({
 					model: ToDoListModel,
-					id: "task-" + ToDoListModel.id,
+					id: "task-" + ToDoListModel.id
 				});
 				if(ToDoListModel.get('TaskStatus')){
 					ToDoListView.$el.appendTo( todoView.$el.find('.TaskComplete') );
@@ -172,12 +166,11 @@ $(document).ready(function(){
 			"click .Task"      : "ShowAnswer",
 			"click .submit"    : "Comment",
 			"keyup .text"      : "Enter"
-		},	
+		},
 
 		initialize : function(config){
 			var ToDoListView = this;
 
-			
 			this.render();
 
 			this.model.on('change', function(){
@@ -187,13 +180,10 @@ $(document).ready(function(){
 
 			this.model.on('destroy', this.destroyHandler);
 
-			this.ComentCollection
-
-
 			this.destroyHandler = function(){
 				console.log('destroying', this.toJSON() );
 				ToDoListView.remove();
-			}
+			};
 
 			return this;
 		},
@@ -243,7 +233,7 @@ $(document).ready(function(){
 
 			var model = new ToDoCommentModel({
 				Task:    this.$el[0].id,
-				user:    user, 
+				user:    user,
 				text: text
 			});
 
@@ -275,7 +265,7 @@ $(document).ready(function(){
 
 			div_id = this.$el;
 
-			if (y == 0){
+			if (y === 0){
 				ToDoNotificationCollection.forEach(function (data) {
 					$('#notification').prepend('<div class="not">' + data.attributes.text + '</div>');
 				});
@@ -289,7 +279,7 @@ $(document).ready(function(){
 			});
 		}
 	});
-	
+
 	var i = 0;
 
 	window.tareas = new window.ToDoView({
@@ -323,7 +313,7 @@ $(document).ready(function(){
 	});
 	$('#notification').hide();
 	$('.icon-not').on('click',function(){
-		if (i == 0){
+		if (i === 0){
 			$('#notification').show();
 			i = 1;
 		}else

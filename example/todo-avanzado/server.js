@@ -18,6 +18,7 @@ app.engine('.html', cons.swig);
 app.set('view engine', 'html');
 
 app.use(express.static('./static'));
+app.use("/lib", express.static('../../lib'));
 
 app.use(express.bodyParser());
 app.use(express.cookieParser());
@@ -54,7 +55,7 @@ app.delete('/ToDoTask/:id', function (req, res){
 		if(ToDoList.id === req.params.id){
 			ToDoTask.splice(i,1);
 		}
-	};
+	}
 
 	io.sockets.emit('ToDoList::delete', {id:req.params.id});
 
@@ -116,8 +117,11 @@ app.post('/ToDoNotification', function (req, res){
 /* ####  Notification  #### */
 
 
-var connection = function(socket){	
-
+var connection = function(socket){
+	/* #### Join to channel #### */
+	socket.on('channel', function(channel) {
+        socket.join(channel);
+    });
 
 	/* Events Sockets for Tasks */
 	socket.on('ToDoList::create', function(data){
@@ -140,7 +144,7 @@ var connection = function(socket){
 	socket.on('ToDoComment::create', function(data){
 		ToDoComment.push(data);
 		socket.broadcast.emit('ToDoComment::create', data);
-	    channel = "notification";
+		channel = "notification";
 		io.sockets.in(channel).emit('message',data);
 	});
 
@@ -150,18 +154,9 @@ var connection = function(socket){
 		ToDoNotification.push(data);
 		socket.broadcast.emit('ToDoComment::create', data);
 	});
-	
-
-	/* #### Join to channel #### */
-	socket.on('channel', function(channel) {
-        socket.join(channel);
-        console.log(channel);
-    });
-
-}
+};
 
 io.sockets.on('connection', connection);
-
 
 server.listen(3000);
 console.log('visita http://localhost:3000 para ver el ToDo');
