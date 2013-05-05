@@ -5,7 +5,7 @@ En mejorandola tenemos un Backend de Djando y Nodejs(Express + Socket.io) y quer
 El interes del proyecto es tener un archivo o un folder que pongamos en nuestros proyecto y podamos empezar a desarrollar apliaciones con mucho javascript del lado del cliente de manera facil y sencilla.
 
 Por el momento no llevamos mucho, pero estamos seguros de un par de cosas.
-* jQuery: Queremos tener jQuere para manipular el DOM y hacer eventos.
+* jQuery: Queremos tener jQuery para manipular el DOM y hacer eventos.
 * Backbone: El tipo de informacion que manejamos en mejorando tiende a entrar perfectamente en Colecciones y Modelos al estilo de Backbone, por lo cual no hay que reinventar la rueda.
 * Neon: Es una libreria que nos permite generar Clases y Modulos que reusaremos por nuestra aplicacion.
 * CustomEventSuport: Es un modulo de Neon que nos permite hacer que todas nuestras clases tengan suporte para programar orientodos a eventos.
