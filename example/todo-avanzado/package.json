@@ -1,5 +1,5 @@
 {
-	"name": "More than a ToDo",
+	"name": "More-than-a-ToDo",
 	"version": "1.0.0",
 	"dependencies": {
 		"socket.io": "0.9.14",
