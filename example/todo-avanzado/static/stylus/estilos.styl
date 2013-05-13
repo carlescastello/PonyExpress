@@ -1,5 +1,7 @@
+@import "/stylus/normalize.styl"
 body
   background  url(/img/bg.png)
+  font-family Trebuchet MS
   font-size  16px
   text-align  center
 
@@ -79,7 +81,7 @@ nav
 .not
   color  #898C96
   padding  0.7em 1em
-  & hover
+  &:hover
     background  gray
     color  white
 
@@ -198,7 +200,7 @@ nav
   transition  all .3s ease
   vertical-align  middle
 
-.IndTask hover .remove
+.IndTask:hover .remove
   opacity  0.8 !important
 
 
