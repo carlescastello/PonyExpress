@@ -44,6 +44,14 @@ window.ToDoNotificationCollection = new NotificationCollection();
 
 window.ponyExpress.bind('connect', function(){
 
+	var ToDoComment = $.get('/ToDoComment');
+	ToDoComment.done(function(data){
+		window.ToDoCommentCollection.add(data);
+		window.ToDoCommentPlug  = new PonyExpress.BackbonePlug({
+			collection : window.ToDoCommentCollection
+		});
+	});
+	
 	var ToDoNotification = $.get('/ToDoNotification');
 	ToDoNotification.done(function(data){
 
@@ -60,16 +68,9 @@ window.ponyExpress.bind('connect', function(){
 		
 	});
 
-	var xhrToDoComment = $.get('/ToDoComment');
-	xhrToDoComment.done(function(data){
-		window.ToDoCommentCollection.add(data);
-		window.ToDoCommentPlug  = new PonyExpress.BackbonePlug({
-			collection : window.ToDoCommentCollection
-		});
-	});
 
-	var xhrToDoTasks = $.get('/ToDoTask');
-	xhrToDoTasks.done(function(data){
+	var ToDoTasks = $.get('/ToDoTask');
+	ToDoTasks.done(function(data){
 		window.ToDoListCollection.add(data);
 		window.ToDoListPlug  = new PonyExpress.BackbonePlug({
 			collection : window.ToDoListCollection
@@ -319,7 +320,7 @@ $(document).ready(function(){
 	$('#notification').css('border','0px');
 	$('.icon-not').on('click',function(){
 		if (i === 0){
-			$('#notification').css('max-height','220px');
+			$('#notification').css('max-height','240px');
 			$('#notification').css('overflow','auto');
 			$('#notification').css('padding','1em 0');
 			$('#notification').css('border','1px solid rgb(209, 210, 211)');

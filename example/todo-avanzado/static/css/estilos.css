@@ -44,7 +44,7 @@ nav{background:url("/img/bg.png");bottom:0;box-shadow:0 0 1.2em rgba(0,0,0,0.1);
 #all,#incomplete,#complete{background:#fff;border-radius:.8em;border:1px solid #d2d3d4;box-shadow:0 0 10px #d2d3d4;cursor:pointer;display:inline-block;font-weight:bold;margin:1em 2em .8em 2em;padding:.5em 0;vertical-align:middle;width:188px}
 #num{background:#f00;border-radius:.4em;border:1px solid #f00;color:#fff;left:73.5%;position:absolute;top:65px;width:23px;z-index:3}
 #Tasks{margin-bottom:55px}
-#notification{-moz-transition:max-height 1s ease;-ms-transition:max-height 1s ease;-o-transition:max-height 1s ease;-webkit-transition:max-height 1s ease;background:#dbdbdb;border:0 solid #d1d2d3;box-shadow:#d1d2d3 0 0 1em;left:70%;max-height:0;overflow:auto;padding:0;position:absolute;text-align:left;top:85px;transition:padding .2s ease;width:220px;z-index:2}
+#notification{-moz-transition:max-height 1s ease;-ms-transition:max-height 1s ease;-o-transition:max-height 1s ease;-webkit-transition:max-height 1s ease;background:#dbdbdb;border:0 solid #d1d2d3;box-shadow:#d1d2d3 0 0 1em;left:70%;max-height:0;overflow:auto;padding:0;position:absolute;text-align:left;top:85px;transition:padding .2s ease;width:240px;z-index:2}
 .not{color:#898c96;padding:.7em 1em;}
 .not:hover{background:#808080;color:#fff}
 .answer{-moz-transition:all .2s ease;-ms-transition:all .2s ease;-o-transition:all .2s ease;-webkit-transition:all .2s ease;height:0;overflow:hidden;padding:0 0;transition:all .2s ease}
