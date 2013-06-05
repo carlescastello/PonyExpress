@@ -44,25 +44,33 @@ window.ToDoNotificationCollection = new NotificationCollection();
 
 window.ponyExpress.bind('connect', function(){
 
-	var ToDoNotification = $.get('/ToDoNotification');
-	ToDoNotification.done(function(data){
-		window.ToDoNotificationCollection.add(data);
-		window.ToDoListPlug  = new PonyExpress.BackbonePlug({
-			collection : window.ToDoNotificationCollection,
-			channel    : "notification"
-		});
-	});
-
-	var xhrToDoComment = $.get('/ToDoComment');
-	xhrToDoComment.done(function(data){
+	var ToDoComment = $.get('/ToDoComment');
+	ToDoComment.done(function(data){
 		window.ToDoCommentCollection.add(data);
 		window.ToDoCommentPlug  = new PonyExpress.BackbonePlug({
 			collection : window.ToDoCommentCollection
 		});
 	});
+	
+	var ToDoNotification = $.get('/ToDoNotification');
+	ToDoNotification.done(function(data){
 
-	var xhrToDoTasks = $.get('/ToDoTask');
-	xhrToDoTasks.done(function(data){
+		window.ToDoNotificationCollection.add(data);
+		
+		window.ToDoListPlug  = new PonyExpress.BackbonePlug({
+			collection : window.ToDoNotificationCollection,
+			channel    : "notification"
+		});
+
+		ToDoNotificationCollection.forEach(function (data) {
+			$('#notification').prepend('<div class="not">' + data.attributes.text + '</div>');
+		});
+		
+	});
+
+
+	var ToDoTasks = $.get('/ToDoTask');
+	ToDoTasks.done(function(data){
 		window.ToDoListCollection.add(data);
 		window.ToDoListPlug  = new PonyExpress.BackbonePlug({
 			collection : window.ToDoListCollection
@@ -79,19 +87,25 @@ $(document).ready(function(){
 	/* #### Notification #### */
 	socket.on('ToDoComment::create', function(data) {
 		var model = new ToDoNotificationModel( {text: 'New comment by: ' + data.user } );
-		console.log(model);
 		$('#notification').prepend('<div class="not">' + model.attributes.text +'</div>');
+		$('#' + data.Task ).find('.answer-comments').append("<div class='comments'><h3>" + data.user + "</h3><p>" + data.text + "</p>");
 		model.save();
+		y = y+1;
+		$('#num').html(y);
 	});
 
 	socket.on('ToDoList::create', function(data) {
 		var model = new ToDoNotificationModel( {text: 'New task by: ' + data.user} );
 		$('#notification').prepend('<div class="not">' + model.attributes.text + '</div>');
 		model.save();
+		y = y+1;
+		$('#num').html(y);
 	});
 
 	socket.on('ToDoList::update', function(data) {
 		var model;
+		y = y+1;
+		$('#num').html(y);
 		if (data.TaskStatus){
 			model = new ToDoNotificationModel( {text: 'Update task: ' + data.text + ' now is complete'} );
 			$('#notification').prepend('<div class="not">' + model.attributes.text + '</div>');
@@ -133,8 +147,6 @@ $(document).ready(function(){
 					ToDoListView.$el.appendTo( todoView.$el.find('.TaskIncomplete') );
 				}
 			});
-
-
 		},
 
 		send : function(){
@@ -240,8 +252,6 @@ $(document).ready(function(){
 			model.save();
 
 
-			this.$el.find('div.answer-comments').append("<div class='comments'><h3>"+user+"</h3><p>"+text+"</p>");
-
 			this.$el.find('.text').val("");
 
 		},
@@ -265,12 +275,6 @@ $(document).ready(function(){
 
 			div_id = this.$el;
 
-			if (y === 0){
-				ToDoNotificationCollection.forEach(function (data) {
-					$('#notification').prepend('<div class="not">' + data.attributes.text + '</div>');
-				});
-				y=1;
-			}
 
 			ToDoCommentCollection.forEach(function( data ){
 				if ( data.attributes.Task == div_id[0].id ){
@@ -311,19 +315,32 @@ $(document).ready(function(){
 	$('.write').on('click',function(){
 		$('.TaskIncomplete').find('.highlight').click();
 	});
-	$('#notification').hide();
+	$('#notification').css('max-height','0px');
+	$('#notification').css('padding','0px');
+	$('#notification').css('border','0px');
 	$('.icon-not').on('click',function(){
 		if (i === 0){
-			$('#notification').show();
+			$('#notification').css('max-height','240px');
+			$('#notification').css('overflow','auto');
+			$('#notification').css('padding','1em 0');
+			$('#notification').css('border','1px solid rgb(209, 210, 211)');
+			y=0;
+			$('#num').html(y);
 			i = 1;
 		}else
 		{
-			$('#notification').hide();
+			$('#notification').css('max-height','0px');
+			$('#notification').css('overflow','hidden');
+			$('#notification').css('padding','0px');
+			$('#notification').css('border','0px');
 			i = 0;
 		}
 	});
 	$('#notification').mouseleave(function(){
-		$('#notification').hide();
+		$('#notification').css('max-height','0px');
+		$('#notification').css('overflow','hidden');
+		$('#notification').css('padding','0px');
+		$('#notification').css('border','0px');
 		i = 0;
 	});
 

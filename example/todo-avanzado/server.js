@@ -18,7 +18,6 @@ app.engine('.html', cons.swig);
 app.set('view engine', 'html');
 
 app.use(express.static('./static'));
-app.use("/lib", express.static('../../lib'));
 
 app.use(express.bodyParser());
 app.use(express.cookieParser());
@@ -116,7 +115,7 @@ app.post('/ToDoNotification', function (req, res){
 });
 /* ####  Notification  #### */
 
-
+channel = "notification";
 var connection = function(socket){
 	/* #### Join to channel #### */
 	socket.on('channel', function(channel) {
@@ -127,7 +126,6 @@ var connection = function(socket){
 	socket.on('ToDoList::create', function(data){
 		ToDoTask.push(data);
 		socket.broadcast.emit('ToDoList::create', data);
-		channel = "notification";
 		io.sockets.in(channel).emit('message',data);
 	});
 	socket.on('ToDoList::delete', function(data){
@@ -135,7 +133,6 @@ var connection = function(socket){
 	});
 	socket.on('ToDoList::update', function(data){
 		socket.broadcast.emit('ToDoList::update', data);
-		channel = "notification";
 		io.sockets.in(channel).emit('message',data);
 	});
 
@@ -144,7 +141,6 @@ var connection = function(socket){
 	socket.on('ToDoComment::create', function(data){
 		ToDoComment.push(data);
 		socket.broadcast.emit('ToDoComment::create', data);
-		channel = "notification";
 		io.sockets.in(channel).emit('message',data);
 	});
 
@@ -159,4 +155,4 @@ var connection = function(socket){
 io.sockets.on('connection', connection);
 
 server.listen(3000);
-console.log('visita http://localhost:3000 para ver el ToDo');
+console.log('Go to http://localhost:3000 for the ToDo');
