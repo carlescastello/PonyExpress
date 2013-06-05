@@ -24,7 +24,7 @@ app.engine('.html', cons.swig);
 app.set('view engine', 'html');
 
 /* Establesco carpeta estatica */
-app.use(express.static('../'));
+app.use(express.static('../../'));
 
 /* Habilito solicitudes POST */
 app.use(express.bodyParser());

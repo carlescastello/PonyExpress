@@ -23,6 +23,7 @@ app.set('view engine', 'html');
 
 /* Establesco carpeta estatica */
 app.use(express.static('./static'));
+app.use(express.static('../..', '/lib'));
 
 /* Habilito solicitudes POST */
 app.use(express.bodyParser());
